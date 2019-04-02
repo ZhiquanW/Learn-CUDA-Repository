@@ -28,7 +28,7 @@ void hello_cuda() {
     x[i] = 1.0f;
     y[i] = 2.0f;
   }
-  int blockSize = 256;
+  int blockSize = 256;  
   int numBlocks = (N + blockSize - 1) / blockSize;
   cout << numBlocks << endl;
   // Run kernel on 1M elements on the GPU
