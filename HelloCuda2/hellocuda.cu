@@ -18,10 +18,11 @@ __global__ void add(int n, float *x, float *y) {
 void hello_cuda() {
   int N = 1 << 20;
   float *x, *y;
-
+  float *a;
   // Allocate Unified Memory – accessible from CPU or GPU
   cudaMallocManaged(&x, N * sizeof(float));
   cudaMallocManaged(&y, N * sizeof(float));
+
   // initialize x and y arrays on the host
   for (int i = 0; i < N; i++) {
     x[i] = 1.0f;
