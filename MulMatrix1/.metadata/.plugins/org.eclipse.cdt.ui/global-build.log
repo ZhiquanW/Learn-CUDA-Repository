@@ -1,0 +1,87 @@
+22:24:06 **** Build of configuration Debug for project MatMul ****
+make all 
+Building file: ../mulmat.cu
+Invoking: NVCC Compiler
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 -gencode arch=compute_50,code=sm_50  -odir "." -M -o "mulmat.d" "../mulmat.cu"
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 --compile --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50  -x cu -o  "mulmat.o" "../mulmat.cu"
+Finished building: ../mulmat.cu
+ 
+Building target: MatMul
+Invoking: NVCC Linker
+/usr/local/cuda-10.1/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -link -o  "MatMul"  ./mulmat.o   
+Finished building target: MatMul
+ 
+22:24:12 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+make: Nothing to be done for 'all'.
+22:27:12 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+make: Nothing to be done for 'all'.
+22:27:59 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+Building file: ../mulmat.cu
+Invoking: NVCC Compiler
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 -gencode arch=compute_50,code=sm_50  -odir "." -M -o "mulmat.d" "../mulmat.cu"
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 --compile --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50  -x cu -o  "mulmat.o" "../mulmat.cu"
+Finished building: ../mulmat.cu
+ 
+Building target: MatMul
+Invoking: NVCC Linker
+/usr/local/cuda-10.1/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -link -o  "MatMul"  ./mulmat.o   
+Finished building target: MatMul
+ 
+22:29:00 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+Building file: ../mulmat.cu
+Invoking: NVCC Compiler
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 -gencode arch=compute_50,code=sm_50  -odir "." -M -o "mulmat.d" "../mulmat.cu"
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 --compile --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50  -x cu -o  "mulmat.o" "../mulmat.cu"
+Finished building: ../mulmat.cu
+ 
+Building target: MatMul
+Invoking: NVCC Linker
+/usr/local/cuda-10.1/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -link -o  "MatMul"  ./mulmat.o   
+Finished building target: MatMul
+ 
+23:18:00 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+make: Nothing to be done for 'all'.
+23:18:47 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+Building file: ../mulmat.cu
+Invoking: NVCC Compiler
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 -gencode arch=compute_50,code=sm_50  -odir "." -M -o "mulmat.d" "../mulmat.cu"
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 --compile --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50  -x cu -o  "mulmat.o" "../mulmat.cu"
+Finished building: ../mulmat.cu
+ 
+Building target: MatMul
+Invoking: NVCC Linker
+/usr/local/cuda-10.1/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -link -o  "MatMul"  ./mulmat.o   
+Finished building target: MatMul
+ 
+23:19:39 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+Building file: ../mulmat.cu
+Invoking: NVCC Compiler
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 -gencode arch=compute_50,code=sm_50  -odir "." -M -o "mulmat.d" "../mulmat.cu"
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 --compile --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50  -x cu -o  "mulmat.o" "../mulmat.cu"
+Finished building: ../mulmat.cu
+ 
+Building target: MatMul
+Invoking: NVCC Linker
+/usr/local/cuda-10.1/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -link -o  "MatMul"  ./mulmat.o   
+Finished building target: MatMul
+ 
+23:20:52 **** Incremental Build of configuration Debug for project MatMul ****
+make all 
+Building file: ../mulmat.cu
+Invoking: NVCC Compiler
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 -gencode arch=compute_50,code=sm_50  -odir "." -M -o "mulmat.d" "../mulmat.cu"
+/usr/local/cuda-10.1/bin/nvcc -G -g -O0 --compile --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50  -x cu -o  "mulmat.o" "../mulmat.cu"
+Finished building: ../mulmat.cu
+ 
+Building target: MatMul
+Invoking: NVCC Linker
+/usr/local/cuda-10.1/bin/nvcc --cudart static --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -link -o  "MatMul"  ./mulmat.o   
+Finished building target: MatMul
+ 

@@ -45,13 +45,14 @@ int main() {
     }
   }
   MatMul(h_A, h_B, h_C);
-  float tmp_value = w;
+  float tmp_value = 4096;
   float sum_error = 0;
   for (int i = 0; i < h_C.height; ++i) {
     for (int j = 0; j < h_C.width; ++j) {
       sum_error += fabs(tmp_value - h_C.elements[i * h_C.width + j]);
     }
   }
+  cout << h_C.elements[0] << endl;
   cout << "sum error : " << sum_error << endl;
   free(h_A.elements);
   free(h_B.elements);
@@ -80,8 +81,7 @@ void MatMul(const Matrix A, const Matrix B, Matrix C) {
   cudaMalloc((void **)&d_C.elements, size);
 
   dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
-  dim3 dimGrid(3, 3);
-  cout << dimGrid.x << " " << dimGrid.y << endl;
+  dim3 dimGrid(4, 4);
   MatMulKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
   cudaMemcpy(C.elements, d_C.elements, size, cudaMemcpyDeviceToHost);
 
