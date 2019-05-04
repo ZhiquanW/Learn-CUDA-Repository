@@ -80,7 +80,7 @@ void MatMul(const Matrix A, const Matrix B, Matrix C) {
   cudaMalloc((void **)&d_C.elements, size);
 
   dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
-  dim3 dimGrid(256, 256);
+  dim3 dimGrid(3,3);
   cout << dimGrid.x << " " << dimGrid.y << endl;
   MatMulKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
   cudaMemcpy(C.elements, d_C.elements, size, cudaMemcpyDeviceToHost);

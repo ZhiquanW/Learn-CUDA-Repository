@@ -1,4 +1,4 @@
-23:20:52 **** Incremental Build of configuration Debug for project MatMul ****
+23:25:29 **** Incremental Build of configuration Debug for project MatMul ****
 make all 
 Building file: ../mulmat.cu
 Invoking: NVCC Compiler
@@ -12,5 +12,5 @@ Invoking: NVCC Linker
 Finished building target: MatMul
  
 
-23:20:54 Build Finished (took 1s.967ms)
+23:25:31 Build Finished (took 2s.25ms)
 

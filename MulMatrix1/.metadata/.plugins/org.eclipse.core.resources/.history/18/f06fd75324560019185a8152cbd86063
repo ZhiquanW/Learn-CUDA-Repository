@@ -7,8 +7,8 @@ typedef struct Matrix {
 } Mat;
 
 #define BLOCK_SIZE 16
-#define w 4096
-#define h 4096
+#define w 32
+#define h 32
 
 __global__ void MatMulKernel(const Matrix, const Matrix, Matrix);
 void MatMul(const Matrix A, const Matrix B, Matrix C);
@@ -80,7 +80,7 @@ void MatMul(const Matrix A, const Matrix B, Matrix C) {
   cudaMalloc((void **)&d_C.elements, size);
 
   dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
-  dim3 dimGrid(256, 256);
+  dim3 dimGrid(2,2	);
   cout << dimGrid.x << " " << dimGrid.y << endl;
   MatMulKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
   cudaMemcpy(C.elements, d_C.elements, size, cudaMemcpyDeviceToHost);
