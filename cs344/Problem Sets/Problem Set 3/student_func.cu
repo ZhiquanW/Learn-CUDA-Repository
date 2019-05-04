@@ -1,3 +1,6 @@
+
+%%cuda --name student_func.cu
+
 /* Udacity Homework 3
    HDR Tone-mapping
 
@@ -6,7 +9,7 @@
 
   A High Dynamic Range (HDR) image contains a wider variation of intensity
   and color than is allowed by the RGB format with 1 byte per channel that we
-  have used in the previous assignment.  
+  have used in the previous assignment.
 
   To store this extra information we use single precision floating point for
   each channel.  This allows for an extremely wide range of intensity values.
@@ -53,7 +56,7 @@
   Old TV signals used to be transmitted in this way so that black & white
   televisions could display the luminance channel while color televisions would
   display all three of the channels.
-  
+
 
   Tone-mapping
   ============
@@ -80,6 +83,16 @@
 */
 
 #include "utils.h"
+#include <iostream>
+using namespace std;
+__global__ void switch_value_per_block(const float * const d_logLuminance,
+                                       float * const d_switch_logLuminance,
+                                       const size_t arr_len);
+
+__global__ void find_min_max_per_block(const float * const d_logLuminance,
+                                       float * const d_out_logLuminance,
+                                       const size_t arr_len,
+                                       float * const min_max_arr);
 
 void your_histogram_and_prefixsum(const float* const d_logLuminance,
                                   unsigned int* const d_cdf,
@@ -87,8 +100,7 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
                                   float &max_logLum,
                                   const size_t numRows,
                                   const size_t numCols,
-                                  const size_t numBins)
-{
+                                  const size_t numBins){
   //TODO
   /*Here are the steps you need to implement
     1) find the minimum and maximum value in the input logLuminance channel
@@ -99,6 +111,127 @@ void your_histogram_and_prefixsum(const float* const d_logLuminance,
     4) Perform an exclusive scan (prefix sum) on the histogram to get
        the cumulative distribution of luminance values (this should go in the
        incoming d_cdf pointer which already has been allocated for you)       */
+    
+    
+    cout << "start" << endl;
+
+    
+    //# Image Parameters
+    const size_t arr_len = numRows * numCols;
+
+    //# Set up grid & block size
+    const int block_len = 512;
+    const dim3 block_size(block_len);
+    const int grid_len = (arr_len - 1) / block_len + 1;
+    const dim3 grid_size(grid_len);
+    
+    //# Allocate device memory for switch_value_per_block()
+    float * d_switched_logLuminance;
+    float * h_switched_logLuminance = (float*)malloc(sizeof(float)*arr_len);
+    checkCudaErrors(cudaMalloc(&d_switched_logLuminance,sizeof(float)*arr_len));
+    
+    //# Call Device Funtions : Switch Min & Max for the first time
+    switch_value_per_block<<<grid_size,block_size,sizeof(float)*block_size.x>>>(d_logLuminance,d_switched_logLuminance,arr_len);  
+    
+    //# Allocate device memory for find_min_max_per_block()
+    float * d_min_max_arr;
+    checkCudaErrors(cudaMalloc(&d_min_max_arr,sizeof(float)*grid_len*2));
+    //# Call Device Funtions : find_min_max_per_block
+    find_min_max_per_block<<<grid_size,block_size,sizeof(float)*block_size.x>>>(d_switched_logLuminance,arr_len,d_min_max_arr);
+    //# Copy switched date back to CPU
+    checkCudaErrors(cudaMemcpy(h_switched_logLuminance,d_switched_logLuminance,sizeof(float)*arr_len,cudaMemcpyDeviceToHost));
+   
+    //# Test result
+    if(true){
+        for(int i = 0;i < block_len/2;++ i){
+            if(h_switched_logLuminance[512+i] > h_switched_logLuminance[512+i+256]){
+                cout << i <<" " << h_switched_logLuminance[i] <<" " <<  h_switched_logLuminance[i+256] << endl;
+            }
+        }
+    }
+
+    
+    cout << "end" << endl;
+}
+
+__global__ void switch_value_per_block(const float * const d_logLuminance,
+                                       float * const d_switched_logLuminance, 
+                                       const size_t arr_len){
+    //# Set up shared memory
+    extern __shared__ float s_logLuminance[];
+    //Set up index
+    int g_arr_index = threadIdx.x + blockIdx.x*blockDim.x;
+    int s_arr_index = threadIdx.x;
+    if(g_arr_index >= arr_len){ 
+        return;
+    }
+    //# Copy from global memory to shared memory
+    s_logLuminance[s_arr_index] = d_logLuminance[g_arr_index];
+    __syncthreads();
+
+    //# switch values
+    !!! if min_index > arr_len
+    if(s_arr_index < blockDim.x/2){
+        int min_index = s_arr_index+blockDim.x/2;
+        if((blockIdx.x+1)*blockDim.x>=arr_len){
+
+        }
+        if(s_logLuminance[s_arr_index] > s_logLuminance[min_index]){
+            float tmp_v = s_logLuminance[min_index];
+            s_logLuminance[min_index] = s_logLuminance[s_arr_index];
+            s_logLuminance[s_arr_index] = tmp_v;
+        }
+    }
+    __syncthreads();
+   
+    //# write shared memory data back to global memory
+    d_switched_logLuminance[g_arr_index] = s_logLuminance[s_arr_index];
+}
 
 
+__global__ void find_min_max_per_block(const float * const d_switched_logLuminance,
+                                       const size_t arr_len,
+                                       float * const min_max_arr){
+    //#copy data from global memory to shared memory
+    extern __shared__ float s_logLuminance[];
+    int g_arr_index = threadIdx.x + blockIdx.x*blockDim.x;
+    int s_arr_index = threadIdx.x;
+    if(g_arr_index >= arr_len){
+        return;
+    }
+    s_logLuminance[s_arr_index] = d_switched_logLuminance[g_arr_index];
+    __syncthreads();
+    
+    //#find min&max value in the block
+    int is_odd_len = arr_len % 2;
+    s_arr_index -= is_odd_len;
+    /*
+    for(int interval = arr_len / 2;interval > 0; interval /= 2){
+        //##find min value & store in the head 
+        //## for the first loop, switch values
+        if(s_arr_index < interval){
+            int min_index = s_arr_index+interval;
+            if(s_logLuminance[s_arr_index] > s_logLuminance[min_index]){
+                float tmp_v = s_logLuminance[min_index];
+                s_logLuminance[min_index] = s_logLuminance[s_arr_index];
+                s_logLuminance[s_arr_index] = tmp_v;
+            } 
+        }
+        //##find max value & store in the tail
+        if(s_arr_index > arr_len-interval){
+            int max_index = s_arr_index-interval;
+            if(s_logLuminance[s_arr_index] < s_logLuminance[max_index]){
+                s_logLuminance[s_arr_index] = s_logLuminance[max_index];
+            }
+        }
+    }
+    //# if arr len is odd, check the last value
+    if(arr_len %2 == 1){
+        if(s_logLuminance[arr_len-1] < s_logLuminance[0]){
+            s_logLuminance[0] = s_logLuminance[arr_len-1];
+        } 
+    }
+    */
+    
+                                                     
 }
