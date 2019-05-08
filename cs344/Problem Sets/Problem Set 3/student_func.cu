@@ -23,9 +23,12 @@ __global__ void compute_histo_bins(const float *const d_logLuminance,
                                    const float min_logLum,
                                    const float max_logLum);
 
-__global__ scan_histo(const unsigned int *const d_histo_bins,
-                      const size_t num_bins, unsigned int *const d_cdf);
+__global__ void pre_scan_histo(const unsigned int *const d_histo_bins,
+                               const size_t num_bins, unsigned int *const d_cdf,
+                               unsigned int *const d_sums);
 
+__global__ void post_scan_histo(unsigned int *const d_cdf,
+                                unsigned int *const d_sums);
 void your_histogram_and_prefixsum(const float *const d_logLuminance,
                                   unsigned int *const d_cdf, float &min_logLum,
                                   float &max_logLum, const size_t numRows,
@@ -88,7 +91,14 @@ void your_histogram_and_prefixsum(const float *const d_logLuminance,
         cudaMemset(d_histo_bins, 0, sizeof(unsigned int) * numBins));
     compute_histo_bins<<<grid_size, block_size>>>(
         d_logLuminance, arr_len, d_histo_bins, numBins, min_logLum, max_logLum);
-    cout << "Min MAX " << min_logLum << " : " << max_logLum << endl;
+
+    float *d_sums;
+    checkCudaErrors(cudaMalloc(d_sums, sizeof(unsigned int) * grid_len));
+    const size_t buffer_len = block_len * 2;
+    pre_scan_histo<<<grid_size, block_size,
+                     sizeof(unsigned int) * buffer_len>>>(d_histo_bins, numBins,
+                                                          d_cdf, d_sums);
+    /*
     unsigned int *h_histo_bins = new unsigned int[numBins];
     checkCudaErrors(cudaMemcpy(h_histo_bins, d_histo_bins,
                                sizeof(unsigned int) * numBins,
@@ -101,6 +111,7 @@ void your_histogram_and_prefixsum(const float *const d_logLuminance,
     }
     checkCudaErrors(cudaMemcpy(d_cdf, h_cdf, sizeof(unsigned int) * numBins,
                                cudaMemcpyHostToDevice));
+    */
     cout << "end" << endl;
 }
 
@@ -271,4 +282,12 @@ __global__ void pre_scan_histo(const unsigned int *const d_histo_bins,
     d_cdf[2 * g_id] = shared_buffer[2 * t_id];
     d_cdf[2 * g_id + 1] = shared_buffer[2 * t_id + 1];
     d_sums[blockIdx.x] = shared_buffer[blockDim.x - 1];
+}
+
+__global__ void post_scan_histo(unsigned int *const d_cdf,
+                                unsigned int *const d_sums) {
+    extern __shared__ unsigned int shared_buffer[];
+    int t_id = threadIdx.x;
+    shared_buffer[t_id] = d_cdf[t_id];
+    __syncthreads();
 }
